@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내진설계 반응수정계수(R) 교육자료</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --danger: #e74c3c;
+            --bg: #f8f9fa;
+            /* 애니메이션 제어용 CSS 변수 추가 */
+            --sway-angle: 2deg;
+            --anim-duration: 2s;
+        }
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card {
+            background: white;
+            max-width: 900px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        h1 { border-bottom: 3px solid var(--primary); padding-bottom: 10px; font-size: 24px; }
+        h2 { color: var(--accent); font-size: 20px; margin-top: 30px; }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            background: #eee;
+            padding: 20px;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .visual-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .building-svg {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        /* CSS 변수를 활용한 동적 흔들림 애니메이션 */
+        @keyframes sway {
+            0% { transform: skewX(0deg); }
+            25% { transform: skewX(var(--sway-angle)); }
+            75% { transform: skewX(calc(var(--sway-angle) * -1)); }
+            100% { transform: skewX(0deg); }
+        }
+        
+        .sway-active {
+            animation: sway var(--anim-duration) infinite ease-in-out;
+            transform-origin: bottom;
+        }
+
+        .force-arrow {
+            opacity: 0;
+            transition: opacity 0.3s, stroke-width 0.3s;
+        }
+        .force-active { opacity: 1; }
+
+        .formula-box {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 15px;
+            background: #f0f7ff;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px dashed var(--accent);
+        }
+
+        .btn-group { text-align: center; margin-bottom: 20px; }
+        .btn-group button {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: #e0e0e0;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 0 5px;
+            transition: 0.2s;
+        }
+        .btn-group button.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>반응수정계수(R) 및 시스템 하중흐름 시뮬레이터</h1>
+    
+    <section>
+        <h2>1. 반응수정계수(R)에 따른 설계지진력(Vd) 변화</h2>
+        <div class="controls">
+            <label>반응수정계수 (R) 조절: <span id="r-val-display" style="font-weight:bold; color:var(--danger); font-size:24px;">5.0</span></label>
+            <input type="range" id="r-slider" min="1.25" max="8" step="0.25" value="5" style="width:300px;">
+        </div>
+        <div class="formula-box">
+            V<sub>d</sub> = V<sub>e</sub> / <span id="formula-r" style="color:var(--danger);">5.0</span>
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <svg width="400" height="220" id="graph-svg">
+                <line x1="40" y1="180" x2="360" y2="180" stroke="#333" stroke-width="2"/>
+                <line x1="40" y1="180" x2="40" y2="20" stroke="#333" stroke-width="2"/>
+                <rect x="80" y="30" width="80" height="150" fill="#bdc3c7"/>
+                <text x="120" y="20" text-anchor="middle" font-size="14" font-weight="bold">탄성지진력(Ve)</text>
+                
+                <rect id="design-bar" x="220" y="150" width="80" height="30" fill="#e74c3c" style="transition: all 0.2s ease;">
+                </rect>
+                <text id="design-label" x="260" y="140" text-anchor="middle" font-size="14" font-weight="bold" fill="#e74c3c" style="transition: all 0.2s ease;">설계지진력(Vd)</text>
+            </svg>
+        </div>
+    </section>
+
+    <section>
+        <h2>2. 지진 발생 시 시스템별 흔들림 및 횡력 분배</h2>
+        <div class="btn-group">
+            <button id="btn-bf" class="active" onclick="setSystem('BF')">건물골조시스템</button>
+            <button id="btn-dual" onclick="setSystem('Dual')">이중골조시스템</button>
+        </div>
+
+        <div class="visual-container">
+            <svg width="320" height="380" class="building-svg">
+                <g id="building-model" class="sway-active">
+                    <rect x="60" y="60" width="200" height="12" fill="#95a5a6"/>
+                    <rect x="60" y="140" width="200" height="12" fill="#95a5a6"/>
+                    <rect x="60" y="220" width="200" height="12" fill="#95a5a6"/>
+                    <rect x="60" y="300" width="200" height="12" fill="#95a5a6"/>
+                    
+                    <line x1="80" y1="60" x2="80" y2="350" stroke="#7f8c8d" stroke-width="6" id="col-left" style="transition: stroke 0.3s;"/>
+                    <line x1="240" y1="60" x2="240" y2="350" stroke="#7f8c8d" stroke-width="6" id="col-right" style="transition: stroke 0.3s;"/>
+                    
+                    <rect x="145" y="60" width="30" height="290" fill="#2c3e50" id="shear-wall"/>
+                    
+                    <path id="wall-arrow-1" d="M 10 80 L 135 80" stroke="#e74c3c" stroke-width="4" fill="none" marker-end="url(#arrowhead-red)" class="force-arrow force-active"/>
+                    <path id="wall-arrow-2" d="M 10 160 L 135 160" stroke="#e74c3c" stroke-width="4" fill="none" marker-end="url(#arrowhead-red)" class="force-arrow force-active"/>
+                    
+                    <path id="mf-arrow-1" d="M 10 65 L 70 65" stroke="#3498db" stroke-width="3" fill="none" marker-end="url(#arrowhead-blue)" class="force-arrow"/>
+                    <path id="mf-arrow-2" d="M 10 145 L 70 145" stroke="#3498db" stroke-width="3" fill="none" marker-end="url(#arrowhead-blue)" class="force-arrow"/>
+                </g>
+                <rect x="10" y="350" width="300" height="20" fill="#34495e"/>
+                
+                <defs>
+                    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c" />
+                    </marker>
+                    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#3498db" />
+                    </marker>
+                </defs>
+            </svg>
+
+            <div style="flex:1; min-width:300px; display: flex; flex-direction: column; justify-content: center;">
+                <h3 id="system-title" style="color:var(--primary); font-size: 22px;">건물골조시스템</h3>
+                <p id="system-desc" style="font-size: 16px; line-height: 1.6;">지진에 의한 횡력을 <strong>100% 중앙 전단벽</strong>이 부담합니다. 기둥은 수직방향 중력하중만 지지하며 횡력에는 저항하지 않습니다.</p>
+                <div style="background: #f1f2f6; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                    <ul id="system-points" style="margin:0; padding-left: 20px; line-height: 1.8;">
+                        <li>전단벽 손상 시 붕괴 위험 (잉여도 낮음)</li>
+                        <li>골조의 횡력 분담률: 0%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+    const slider = document.getElementById('r-slider');
+    const rDisplay = document.getElementById('r-val-display');
+    const formulaR = document.getElementById('formula-r');
+    const designBar = document.getElementById('design-bar');
+    const designLabel = document.getElementById('design-label');
+    
+    // 화살표 굵기 제어를 위한 요소들
+    const wallArrow1 = document.getElementById('wall-arrow-1');
+    const wallArrow2 = document.getElementById('wall-arrow-2');
+
+    function updateVisuals() {
+        const r = parseFloat(slider.value);
+        rDisplay.innerText = r.toFixed(2);
+        formulaR.innerText = r.toFixed(2);
+        
+        // 1. 설계지진력 그래프 업데이트 (기준 높이 150)
+        const baseHeight = 150;
+        const newHeight = baseHeight / r;
+        designBar.setAttribute('height', newHeight);
+        designBar.setAttribute('y', 180 - newHeight);
+        designLabel.setAttribute('y', 170 - newHeight);
+        
+        // 2. 흔들림 각도(sway)와 속도 업데이트
+        // R이 1.25면 크게(약 12도) 흔들리고, 8이면 작게(1.5도) 흔들리도록 비례 설정
+        const swayAngle = (15 / r).toFixed(2); 
+        const duration = (1 + (r / 5)).toFixed(2); // R이 클수록 천천히 흔들림
+        
+        document.documentElement.style.setProperty('--sway-angle', `${swayAngle}deg`);
+        document.documentElement.style.setProperty('--anim-duration', `${duration}s`);
+
+        // 3. 화살표 굵기도 지진력(Vd)에 비례하여 변경
+        const strokeW = Math.max(2, 10 / r).toFixed(1);
+        wallArrow1.setAttribute('stroke-width', strokeW);
+        wallArrow2.setAttribute('stroke-width', strokeW);
+    }
+
+    // 슬라이더 조작 시 실시간 업데이트
+    slider.addEventListener('input', updateVisuals);
+    
+    // 초기 렌더링
+    updateVisuals();
+
+    // 시스템 전환 버튼 로직
+    function setSystem(type) {
+        const btnBF = document.getElementById('btn-bf');
+        const btnDual = document.getElementById('btn-dual');
+        const colL = document.getElementById('col-left');
+        const colR = document.getElementById('col-right');
+        const mfArrows = [document.getElementById('mf-arrow-1'), document.getElementById('mf-arrow-2')];
+        
+        const title = document.getElementById('system-title');
+        const desc = document.getElementById('system-desc');
+        const points = document.getElementById('system-points');
+
+        if(type === 'BF') {
+            btnBF.classList.add('active');
+            btnDual.classList.remove('active');
+            
+            // 기둥을 회색으로 (중력만 지지)
+            colL.setAttribute('stroke', '#bdc3c7');
+            colR.setAttribute('stroke', '#bdc3c7');
+            mfArrows.forEach(a => a.classList.remove('force-active'));
+            
+            title.innerText = "건물골조시스템 (Building Frame)";
+            desc.innerHTML = "지진에 의한 횡력을 <strong>100% 중앙 전단벽</strong>이 부담합니다. 기둥은 수직방향 중력하중만 지지하며 횡력에는 저항하지 않습니다.";
+            points.innerHTML = "<li>전단벽 손상 시 붕괴 위험 (잉여도 낮음)</li><li>골조의 횡력 분담률: 0%</li>";
+        } else {
+            btnBF.classList.remove('active');
+            btnDual.classList.add('active');
+            
+            // 기둥을 파란색으로 (횡력 분담 활성화)
+            colL.setAttribute('stroke', '#3498db');
+            colR.setAttribute('stroke', '#3498db');
+            mfArrows.forEach(a => a.classList.add('force-active'));
+            
+            title.innerText = "이중골조시스템 (Dual System)";
+            desc.innerHTML = "전단벽과 <strong>연성모멘트골조(기둥+보)가 협력</strong>하여 지진에 저항합니다. 모멘트골조가 전체 횡력의 최소 25%를 분담해야 인정받습니다.";
+            points.innerHTML = "<li>벽체가 파괴되어도 골조가 버텨줌 (잉여도 매우 높음)</li><li>골조의 횡력 분담률: 최소 25% 이상</li>";
+        }
+    }
+    
+    // 초기 시스템 설정(건물골조)
+    setSystem('BF');
+</script>
+
+</body>
+</html>
