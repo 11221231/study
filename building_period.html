@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS 41 17 00 통합 내진설계 마스터 가이드</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MathJax for LaTeX Equations -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f0f4f8; color: #334155; line-height: 1.6; }
+        
+        /* Custom Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        
+        @keyframes spring {
+            0%, 100% { height: 40px; }
+            50% { height: 80px; }
+        }
+        .animate-spring { animation: spring 1.5s infinite ease-in-out; transform-origin: top; }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .animate-pulse-ring { animation: pulse-ring 2s infinite; }
+
+        /* Custom Styles */
+        .math-container {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+            overflow-x: auto;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 5px solid #22c55e;
+            padding: 1.5rem;
+            border-radius: 0.5rem 1rem 1rem 0.5rem;
+            margin: 1.5rem 0;
+            transition: transform 0.2s;
+        }
+        .tip-box:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.1); }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; background: #fff; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th { background-color: #3b82f6; color: white; padding: 0.75rem 1rem; font-weight: 600; text-align: center; }
+        td { padding: 0.75rem 1rem; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #f8fafc; }
+
+        .section-header {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+            padding-bottom: 0.5rem;
+        }
+        .section-header::after {
+            content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #3b82f6, transparent); border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="antialiased pb-20">
+
+<div class="max-w-5xl mx-auto p-4 sm:p-8 mt-6">
+    
+    <!-- Hero Header -->
+    <div class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-3xl p-8 sm:p-12 text-white text-center shadow-2xl mb-12 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjIiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')]"></div>
+        <div class="relative z-10">
+            <div class="text-6xl mb-4 animate-float inline-block">🏢</div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold mb-4 leading-tight">건축물 내진설계 완벽 가이드</h1>
+            <p class="text-lg sm:text-xl text-blue-200 font-light">KDS 41 17 00 | 이론 정리부터 실전 그래프 작도까지 한 번에 끝내기</p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         Part 1: 내진설계 이론 편
+    =========================================== -->
+    <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-lg border border-gray-100 mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 section-header">[Part 1: 내진설계 이론 및 원리 편] 🧠</h2>
+        
+        <!-- 1. 고유주기 -->
+        <div class="mb-10">
+            <h3 class="text-xl font-bold text-blue-700 flex items-center gap-2 mb-4"><span class="text-2xl">⏱️</span> 1. 건축물 주기($T$)의 역학적 이해</h3>
+            <p class="text-gray-600 mb-4">건물은 외부 힘을 받으면 스스로 흔들리려는 고유한 박자, 즉 <strong>'고유주기($T$)'</strong>를 갖습니다. 단자유도 시스템에서 주기는 질량과 강성의 밀당으로 결정됩니다.</p>
+            
+            <div class="flex flex-col md:flex-row items-center gap-6">
+                <div class="flex-1 w-full">
+                    <div class="math-container text-lg">
+                        $$T = 2\pi \sqrt{\frac{M}{K}}$$
+                    </div>
+                    <p class="text-sm text-center text-gray-500 font-medium">질량($M$)이 클수록 느리게(주기 증가) / 강성($K$)이 클수록 빠르게(주기 감소)</p>
+                </div>
+                <!-- Visual Animation Box -->
+                <div class="w-full md:w-64 bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center shadow-inner h-48">
+                    <div class="w-full h-3 bg-slate-400 rounded-full"></div>
+                    <div class="w-4 border-x-4 border-blue-400 border-dashed animate-spring" style="height: 60px;"></div>
+                    <div class="w-20 h-16 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">Mass</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 근사고유주기 -->
+        <div class="mb-10">
+            <h3 class="text-xl font-bold text-blue-700 flex items-center gap-2 mb-4"><span class="text-2xl">📐</span> 2. KDS 기준 근사고유주기($T_a$)</h3>
+            <p class="text-gray-600 mb-4">설계 초기에 정확한 주기를 알기 어렵기 때문에, KDS 41 기준에서는 건물의 높이($h_n$)와 구조 시스템 종류에 따라 대략적인 주기를 구하는 공식을 제공합니다.</p>
+            
+            <div class="math-container">
+                $$T_a = C_T \cdot h_n^x$$
+            </div>
+
+            <div class="overflow-x-auto mt-4">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구조 시스템 종류</th>
+                            <th>계수 $C_T$</th>
+                            <th>계수 $x$</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="text-left font-medium">철골 모멘트골조</td><td>0.085</td><td>0.8</td></tr>
+                        <tr><td class="text-left font-medium">콘크리트 모멘트골조</td><td>0.046</td><td>0.9</td></tr>
+                        <tr><td class="text-left font-medium">철골 편심/좌굴방지 가새골조</td><td>0.073</td><td>0.75</td></tr>
+                        <tr><td class="text-left font-medium">기타 모든 구조 시스템 (전단벽식 등)</td><td>0.049</td><td>0.75</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tip-box mt-6">
+                <h4 class="text-lg font-bold text-green-800 mb-2 flex items-center gap-2">🧱 구조기술사의 Tip: 비보강 채움벽과 주기 감소 (2/3배)</h4>
+                <p class="text-green-900 text-sm mb-3">
+                    조적벽(벽돌벽)은 구조 부재가 아니라고 무시하기 쉽습니다. 하지만 지진 시 골조 내부에서 <strong>'대각선 버팀대(스트럿)'</strong> 역할을 하여 건물을 엄청나게 뻣뻣하게 만듭니다.
+                </p>
+                <div class="bg-white/70 p-3 rounded-lg text-center font-bold text-green-800 border border-green-200 text-sm">
+                    건물이 뻣뻣해짐 $\rightarrow$ 강성($K$) 증가 $\rightarrow$ 고유주기($T$) 짧아짐 $\rightarrow$ 지진력 커짐!
+                </div>
+                <p class="text-green-900 text-sm mt-3">안전한 설계를 위해 이런 조적벽이 채워진 RC골조는 주기에 강제로 $2/3$를 곱해 짧게 만들어, 더 큰 지진력에 대비하도록 규정합니다.</p>
+            </div>
+        </div>
+
+        <!-- 3. 모드, 지반, 반응수정계수 -->
+        <div>
+            <h3 class="text-xl font-bold text-blue-700 flex items-center gap-2 mb-4"><span class="text-2xl">🌊</span> 3. 모드 해석과 지반 조건</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Modes -->
+                <div class="bg-blue-50 border border-blue-100 p-6 rounded-2xl">
+                    <h4 class="font-bold text-blue-900 mb-3 flex items-center gap-2">〰️ 1차 모드 vs 🎣 고차 모드</h4>
+                    <p class="text-blue-800 text-sm">
+                        <strong>1차 모드:</strong> 양끝을 잡고 완만하게 돌리는 <strong>'줄넘기'</strong>처럼 건물 전체가 크게 휩니다.<br><br>
+                        <strong>고차 모드:</strong> <strong>'낚싯대'</strong> 끝을 위아래로 흔들 때처럼 건물이 S자나 낭창거리며 떨립니다.
+                    </p>
+                </div>
+                
+                <!-- Mass Participation -->
+                <div class="bg-amber-50 border border-amber-100 p-6 rounded-2xl">
+                    <h4 class="font-bold text-amber-900 mb-3 flex items-center gap-2">🍽️ 질량참여율 90% (뷔페 접시)</h4>
+                    <p class="text-amber-800 text-sm">
+                        건물의 진짜 지진 반응을 보려면, 메인 요리(1차 모드)만 먹어선 안 됩니다. 디저트(고차 모드)까지 포함해 <strong>전체 질량의 90% 이상</strong>을 해석에 참여시켜야 전체 응답을 알 수 있습니다.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Soil Amplification -->
+                <div class="tip-box m-0">
+                    <h4 class="font-bold text-green-900 mb-2 flex items-center gap-2">🍮 지반 증폭 (S1~S6 지반)</h4>
+                    <p class="text-green-800 text-sm">
+                        단단한 테이블($S_1$ 암반)을 치면 접시도 딱 그만큼 흔들리지만, 그 위에 <strong>말캉한 젤리($S_4, S_5$ 연약지반)</strong>를 얹고 치면 젤리 꼭대기는 엄청나게 출렁입니다. 토사층에서 가속도가 증폭되는 원리입니다.
+                    </p>
+                </div>
+                
+                <!-- Response Modification Factor -->
+                <div class="tip-box m-0">
+                    <h4 class="font-bold text-green-900 mb-2 flex items-center gap-2">📎 강기둥-약보 철학 ($R$계수)</h4>
+                    <p class="text-green-800 text-sm">
+                        과전류 때 끊어지는 <strong>'전기 퓨즈'</strong>나 구부러지는 <strong>'종이클립'</strong>처럼 부재 일부가 휘며 에너지를 흡수하게(소성힌지) 만듭니다. 이때 붕괴 방지를 위해 기둥이 아닌 <strong>보(Beam)</strong>가 먼저 휘도록 유도합니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         Part 2 & 3: 작도 예제 편
+    =========================================== -->
+    <div class="bg-white rounded-3xl p-6 sm:p-10 shadow-lg border border-gray-100 mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 section-header">[Part 2: 실전 응답스펙트럼 작도 예제] 📈</h2>
+
+        <!-- Project Overview -->
+        <div class="bg-slate-800 text-white p-6 rounded-2xl mb-8 shadow-md">
+            <h3 class="text-lg sm:text-xl font-bold text-amber-400 mb-4 flex items-center gap-2">🎯 가상 프로젝트: 30m 빌딩 내진설계</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm font-medium">
+                <div class="bg-slate-700 p-4 rounded-xl">
+                    <span class="block text-slate-400 mb-1">건물 형태</span>
+                    높이 30m RC 모멘트골조<br>(비보강 채움벽 없음)
+                </div>
+                <div class="bg-slate-700 p-4 rounded-xl">
+                    <span class="block text-slate-400 mb-1">지역 및 지반</span>
+                    서울 (가정 $S=0.2g$)<br>지반 등급: <strong>$S_4$</strong> (깊고 단단)
+                </div>
+                <div class="bg-slate-700 p-4 rounded-xl">
+                    <span class="block text-slate-400 mb-1">설계 조건</span>
+                    중요도계수 $I_E=1.0$<br>반응수정계수 $R=5$
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Steps Container -->
+            <div class="border-l-4 border-blue-500 pl-6 ml-2 space-y-8">
+                
+                <!-- Step 1 -->
+                <div class="relative">
+                    <div class="absolute -left-10 w-6 h-6 bg-blue-500 rounded-full border-4 border-white"></div>
+                    <h4 class="text-lg font-bold text-blue-800 mb-2">Step 1. 지반 계수 및 설계가속도 산정</h4>
+                    <p class="text-gray-600 mb-2 text-sm">지반증폭계수($F_a=1.6, F_v=2.0$)를 적용하여 지표면의 단주기/1초주기 가속도($S_{DS}, S_{D1}$)를 구합니다.</p>
+                    <div class="math-container text-sm sm:text-base bg-slate-50 border-none">
+                        $$S_{DS} = 0.2g \times 1.6 \times \frac{2}{3} = \mathbf{0.213g}$$
+                        $$S_{D1} = 0.2g \times 2.0 \times \frac{2}{3} = \mathbf{0.267g}$$
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative">
+                    <div class="absolute -left-10 w-6 h-6 bg-blue-500 rounded-full border-4 border-white"></div>
+                    <h4 class="text-lg font-bold text-blue-800 mb-2">Step 2. 그래프 변곡점(통제주기) 계산</h4>
+                    <p class="text-gray-600 mb-2 text-sm">응답스펙트럼 곡선이 꺾이는 주요 기준점($T_0, T_S, T_L$)을 계산합니다.</p>
+                    <div class="math-container text-sm sm:text-base bg-slate-50 border-none">
+                        $$T_S = \frac{S_{D1}}{S_{DS}} = \mathbf{1.25\text{초}} \quad / \quad T_0 = 0.2 \times T_S = \mathbf{0.25\text{초}} \quad / \quad T_L = \mathbf{3.0\text{초}}$$
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="relative">
+                    <div class="absolute -left-10 w-6 h-6 bg-blue-500 rounded-full border-4 border-white"></div>
+                    <h4 class="text-lg font-bold text-blue-800 mb-2">Step 3. 우리 건물의 위치 파악하기</h4>
+                    <p class="text-gray-600 mb-2 text-sm">공식을 이용해 30m RC골조의 근사고유주기($T_a$)를 구합니다.</p>
+                    <div class="math-container text-sm sm:text-base bg-slate-50 border-none mb-3">
+                        $$T_a = 0.046 \times (30)^{0.9} = \mathbf{0.98\text{초}}$$
+                    </div>
+                    <div class="bg-red-50 text-red-700 p-3 rounded-lg text-center font-bold border border-red-200 text-sm inline-block">
+                        🚨 0.98초는 가속도가 가장 높은 고원부 ($0.25\text{초} \le T \le 1.25\text{초}$) 내에 위치합니다!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Area -->
+            <div class="mt-12 bg-gray-50 p-4 sm:p-6 rounded-2xl border border-gray-200">
+                <h4 class="text-lg font-bold text-gray-800 mb-2">📊 시각화: 설계응답스펙트럼 그래프</h4>
+                <p class="text-gray-500 text-sm mb-4">마우스를 올려 구간별 곡선의 변화와 <strong class="text-red-500">우리 건물(빨간 점)</strong>의 위치를 직접 확인해 보세요.</p>
+                <div class="w-full h-80 sm:h-[400px] bg-white rounded-xl shadow-inner border border-gray-100 p-2">
+                    <canvas id="seismicChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="border-l-4 border-blue-500 pl-6 ml-2 mt-8">
+                <div class="relative">
+                    <div class="absolute -left-10 w-6 h-6 bg-blue-500 rounded-full border-4 border-white"></div>
+                    <h4 class="text-lg font-bold text-blue-800 mb-2">Step 4. 지진응답계수($C_s$) 및 밑면전단력 도출</h4>
+                    <p class="text-gray-600 mb-2 text-sm">그래프에서 읽은 $S_a(0.213g)$를 바탕으로, 건물이 버텨야 할 지진 횡력(밑면전단력) 비율을 구합니다.</p>
+                    <div class="math-container text-sm sm:text-base bg-slate-50 border-none">
+                        $$C_s = \frac{S_a}{(R / I_E)} = \frac{0.213}{(5 / 1.0)} = \mathbf{0.0426}$$
+                    </div>
+                    
+                    <div class="tip-box mt-6 animate-pulse-ring">
+                        <h4 class="font-bold text-green-900 mb-2 flex items-center gap-2">💺 구조기술사의 Tip: 최소 지진응답계수 (자동차 안전띠)</h4>
+                        <p class="text-green-800 text-sm mb-3">
+                            건물 주기가 엄청 길어서 $S_a$가 거의 0에 가까워지면 지진력을 안 받아도 될까요? 아닙니다! 예측 불가한 변수를 위해 <strong>"최소한 이만큼은 무조건 버티게 설계해라!"</strong>라는 생명줄(하한선)이 존재합니다.
+                        </p>
+                        <div class="bg-white p-3 rounded-lg text-center text-sm font-semibold text-green-900 border border-green-200 overflow-x-auto">
+                            $$C_{s,min} = 0.044 \cdot S_{DS} \cdot I_E = 0.044 \times 0.213 \times 1.0 = \mathbf{0.00937 < 0.01}$$
+                        </div>
+                        <p class="text-green-900 text-sm mt-3 text-center">
+                            최소 규정치인 0.01보다 우리가 계산한 값(0.0426)이 훨씬 크므로, 최종적으로 <strong>건물 전체 무게의 4.26%에 해당하는 횡력</strong>으로 안전하게 설계하면 됩니다!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-12 mb-8">
+        <div class="inline-block bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black text-2xl sm:text-3xl px-10 py-5 rounded-full shadow-xl transform transition hover:scale-105 hover:-translate-y-1 cursor-default border-4 border-blue-200">
+            🔥 이번주도 동역학을 뿌순다! 🚀
+        </div>
+        <p class="mt-6 text-slate-500 text-sm">본 문서는 구조설계 초보자의 이해를 돕기 위해 작성된 교육용 시각화 자료입니다.</p>
+    </div>
+
+</div>
+
+<!-- Chart Generation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const S_DS = 0.213;
+        const S_D1 = 0.267;
+        const T_0 = 0.25;
+        const T_S = 1.25;
+        const T_L = 3.0;
+        const T_bldg = 0.98;
+        const S_a_bldg = 0.213;
+
+        let dataPoints = [];
+        
+        // Generate continuous points for the spectrum curve
+        for (let t = 0; t <= 4.0; t += 0.02) {
+            let Sa = 0;
+            if (t === 0) Sa = 0.4 * S_DS;
+            else if (t < T_0) Sa = 0.6 * (S_DS / T_0) * t + 0.4 * S_DS;
+            else if (t <= T_S) Sa = S_DS;
+            else if (t <= T_L) Sa = S_D1 / t;
+            else Sa = (S_D1 * T_L) / (t * t);
+            
+            dataPoints.push({x: parseFloat(t.toFixed(2)), y: parseFloat(Sa.toFixed(4))});
+        }
+
+        const controlPoints = [
+            {x: 0, y: parseFloat((0.4 * S_DS).toFixed(4))},
+            {x: T_0, y: S_DS},
+            {x: T_S, y: S_DS},
+            {x: T_L, y: parseFloat((S_D1 / T_L).toFixed(4))}
+        ];
+
+        const buildingPoint = [{x: T_bldg, y: S_a_bldg}];
+
+        const ctx = document.getElementById('seismicChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: '설계응답가속도 Sa (g)',
+                        data: dataPoints,
+                        borderColor: '#3b82f6', // blue-500
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0,
+                        order: 3
+                    },
+                    {
+                        label: '변곡점 (T0, Ts, TL)',
+                        data: controlPoints,
+                        type: 'scatter',
+                        backgroundColor: '#1e3a8a', // blue-900
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        order: 2
+                    },
+                    {
+                        label: `🏢 우리 건물 (T=${T_bldg}초, Sa=${S_a_bldg}g)`,
+                        data: buildingPoint,
+                        type: 'scatter',
+                        backgroundColor: '#ef4444', // red-500
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        pointRadius: 10,
+                        pointHoverRadius: 14,
+                        pointStyle: 'rectRot',
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { family: 'Pretendard', size: 13 } }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { family: 'Pretendard', size: 14 },
+                        bodyFont: { family: 'Pretendard', size: 14 },
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + `: ${context.parsed.y} g`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        title: { display: true, text: '고유주기 T (초)', font: { family: 'Pretendard', size: 14, weight: 'bold' } },
+                        min: 0,
+                        max: 4.0,
+                        grid: { color: '#f1f5f9' },
+                        ticks: { stepSize: 0.5, font: { family: 'Pretendard' } }
+                    },
+                    y: {
+                        title: { display: true, text: '설계가속도 Sa (g)', font: { family: 'Pretendard', size: 14, weight: 'bold' } },
+                        min: 0,
+                        max: 0.25,
+                        grid: { color: '#f1f5f9' },
+                        ticks: { stepSize: 0.05, font: { family: 'Pretendard' } }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
